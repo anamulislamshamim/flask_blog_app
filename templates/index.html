@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Index Page{% endblock %}
+
+{% block content %}
+    <h1>Welcome to Index page!</h1>
+
+    <p>{{ stuff|striptags }}</p>
+
+    <ul>
+        {% for pizza in pizzas %}
+            <li>{{ pizza }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

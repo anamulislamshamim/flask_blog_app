@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Name Form{% endblock %}
+
+{% block content %}
+    {% if name %}
+        <h1>Welcome {{ name }}</h1>
+    {% else %}
+        <h1 class="text-secondary mt-5">What's  Your Name?</h1><br/>
+        <form action="#" method="POST">
+            <!-- form.hidden_tag() is for csrf_token validation. -->
+            {{ form.hidden_tag() }}
+
+            {{ form.name.label(class="form-label") }}<br/>
+            {{ form.name(class='form-control') }}
+            
+            <br>
+            {{ form.submit( class='btn btn-primary') }}
+        </form>
+    {% endif %}
+{% endblock %}
