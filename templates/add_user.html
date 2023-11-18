@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Name Form{% endblock %}
+{% block title %}Add User{% endblock %}
 
 {% block content %}
     {% if name %}
@@ -20,11 +20,8 @@
         {% endwith%}
         <h1 class='mt-5'>Welcome {{ name }}</h1>
         <br>
-        <p id='demo'>This code will replace by text from javascript!</p>
-        <img src="{{ url_for("static", filename="images/kielement.jpeg")}}" 
-        alt="ki:elements" width=1100, height=600>
     {% else %}
-        <h1 class="text-secondary mt-5">What's  Your Name?</h1><br/>
+        <h1 class="text-secondary mt-5">Add New User</h1><br/>
         <form method="POST">
             <!-- form.hidden_tag() is for csrf_token validation. -->
             {{ form.hidden_tag() }}
