@@ -133,3 +133,17 @@ def update(id):
             return render_template("update.html", form=form, name_to_update=name_to_update)
     else:
         return render_template('update.html', form=form, name_to_update=name_to_update)
+
+
+# create route for delete document from the database 
+@app.route('/delete/user/<int:id>')
+def delete(id):
+    user_to_delete = Users.query.get_or_404(id)
+    if user_to_delete:
+        db.session.delete(user_to_delete)
+        db.session.commit()
+        flash(f"{user_to_delete.name} deleted successfully!")
+    else:
+        flash("User doesn't exist! Somethng went wrong! Please try again!")
+        
+    return redirect('/user/add')

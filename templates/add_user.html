@@ -17,8 +17,7 @@
                 {% endfor %}
             {% endif %}
         {% endwith%}
-        <h1 class='mt-5'>Welcome {{ name }}</h1>
-        <br>
+        
         <h1 class="text-secondary mt-5">Add New User</h1><br/>
         <form method="POST" class="shadow-sm p-4 bg-light rounded">
             {{ form.hidden_tag() }}
@@ -54,7 +53,10 @@
                         <td>{{ user.name }}</td>
                         <td>{{ user.email }}</td>
                         <td>{{ user.date_added}}</td>
-                        <td><a href="{{ url_for('update', id= user._id )}}">Update</a></td>
+                        <td>
+                            <a class="text-warning" href="{{ url_for('update', id= user._id )}}">Update</a>
+                            <a class="text-danger ms-2" href="{{ url_for('delete', id= user._id )}}">Delete</a>
+                        </td>
                     </tr>
                 {% endfor %}
             {% endif %}
