@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash
+from flask import Flask, render_template, flash, request, redirect
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, validators
 from wtforms.validators import DataRequired
@@ -44,7 +44,7 @@ class Users(db.Model):
 
 # create a form class 
 class UserForm(FlaskForm):
-    name = StringField("Name", validators=[DataRequired(), validators.Email("Please enter your email address.")])
+    name = StringField("Name", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired()])
     submit = SubmitField("Submit")
     
@@ -106,4 +106,30 @@ def add_user():
             db.session.commit()
             flash(f"{form.name.data} added successfully!")
         name = form.name.data 
-    return render_template('add_user.html', form=form, name=name)
+        form.name.data = ""
+        form.email.data = ""  
+    
+    our_users = Users.query.order_by(Users.date_added)
+          
+    return render_template('add_user.html', form=form, name=name, our_users=our_users)
+
+
+# create route for update the document 
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
+def update(id):
+    form = UserForm()
+    name_to_update = Users.query.get_or_404(id)
+    
+    if request.method == 'POST':
+        name_to_update.name = request.form['name']
+        name_to_update.email = request.form['email']
+
+        try:
+            db.session.commit()
+            flash("User data updated successfully!", "info")
+            return redirect('/user/add')
+        except:
+            flash("Something went wrong! Please try again!")
+            return render_template("update.html", form=form, name_to_update=name_to_update)
+    else:
+        return render_template('update.html', form=form, name_to_update=name_to_update)

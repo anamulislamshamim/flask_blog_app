@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Update Data{% endblock %}
+
+{% block content %}
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div id='toast-div' class="align-items-center bg-success text-light mt-2" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                {{ message }}
+                            </div>
+                            <button type="button" class="btn-close me-2 m-auto btn-light" id="toast-button" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith%}
+        <h1 class="text-secondary mt-5">Update {{ name_to_update.name }} Data</h1><br/>
+        <form method="POST" class="shadow-sm p-4 bg-light rounded">
+            {{ form.hidden_tag() }}
+
+            {{ form.name.label(class="form-label") }}<br/>
+            {{ form.name(class='form-control', value=name_to_update.name) }} </br>
+
+            {{ form.email.label(class="form-label") }}<br/>
+            {{ form.email(class='form-control', value=name_to_update.email) }} </br>
+            
+            <br>
+            {{ form.submit( class='btn btn-primary', value="Update") }}
+        </form>
+{% endblock %}

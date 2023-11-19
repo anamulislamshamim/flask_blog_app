@@ -3,7 +3,6 @@
 {% block title %}Add User{% endblock %}
 
 {% block content %}
-    {% if name %}
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 {% for message in messages %}
@@ -20,20 +19,45 @@
         {% endwith%}
         <h1 class='mt-5'>Welcome {{ name }}</h1>
         <br>
-    {% else %}
         <h1 class="text-secondary mt-5">Add New User</h1><br/>
-        <form method="POST">
-            <!-- form.hidden_tag() is for csrf_token validation. -->
+        <form method="POST" class="shadow-sm p-4 bg-light rounded">
             {{ form.hidden_tag() }}
 
             {{ form.name.label(class="form-label") }}<br/>
-            {{ form.name(class='form-control') }} </br>
+            {{ form.name(class='form-control', placeholder="user name") }} </br>
 
             {{ form.email.label(class="form-label") }}<br/>
-            {{ form.email(class='form-control') }} </br>
+            {{ form.email(class='form-control', placeholder="email") }} </br>
             
             <br>
             {{ form.submit( class='btn btn-primary') }}
         </form>
-    {% endif %}
+    <br/><br/>
+    <!-- users show by table -->
+    <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Join Date</th>
+            <th scope="col">Modify</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% if not our_users %}
+                <tr><td>There is not users!</td></tr>
+            {% else %}
+                {% for user in our_users %}
+                    <tr>
+                        <th scope="row">{{ user._id }}</th>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.date_added}}</td>
+                        <td><a href="{{ url_for('update', id= user._id )}}">Update</a></td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+      </table>
 {% endblock %}
