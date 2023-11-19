@@ -27,6 +27,9 @@
             {{ form.email.label(class="form-label") }}<br/>
             {{ form.email(class='form-control', value=name_to_update.email) }} </br>
             
+            {{ form.badge.label(class="form-label") }}<br/>
+            {{ form.badge(class='form-control', value=name_to_update.badge) }} </br>
+            
             <br>
             {{ form.submit( class='btn btn-primary', value="Update") }}
         </form>

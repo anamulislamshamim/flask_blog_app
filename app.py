@@ -1,9 +1,11 @@
 from flask import Flask, render_template, flash, request, redirect
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, validators
-from wtforms.validators import DataRequired
+from wtforms import StringField, SubmitField, validators, PasswordField, ValidationError
+from wtforms.validators import DataRequired, EqualTo
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from flask_migrate import Migrate
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 # create database instance 
@@ -30,14 +32,33 @@ def create_app():
 app = create_app()
 
 
+# migrate the db
+migrate = Migrate(app, db)
+
+
 # Create Database Model. Note: Model is actually nothing but database table.
 class Users(db.Model):
     # here specify the fields 
     _id = db.Column("id", db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
+    badge = db.Column(db.String(100), nullable=True, unique=False)
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
-
+    # password hashing 
+    password_hash = db.Column(db.String(128))
+    
+    @property
+    def password(self):
+        raise AttributeError('Password is not readable attribute!')
+    
+    @password.setter 
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+    
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password) 
+    
+    
     def __repr__(self):
         return "<Name %r>" % self.name 
 
@@ -46,6 +67,9 @@ class Users(db.Model):
 class UserForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired()])
+    password_hash = PasswordField("Password", validators=[DataRequired(), EqualTo('password_hash2', message="Passwords must be match!")])
+    password_hash2 = PasswordField("Confirm Password", validators=[DataRequired()])
+    badge = StringField("Badge")
     submit = SubmitField("Submit")
     
 
@@ -101,13 +125,16 @@ def add_user():
         # validate whether this email is already exist in our system. If user exist then return the email otherwise will return None 
         user = Users.query.filter_by(email=form.email.data).first()
         if user is None:
-            user = Users(name=form.name.data, email=form.email.data) 
+            # hash the password
+            hashed_pass = generate_password_hash(form.password_hash.data)
+            user = Users(name=form.name.data, email=form.email.data, badge=form.badge.data, password_hash=hashed_pass) 
             db.session.add(user)
             db.session.commit()
             flash(f"{form.name.data} added successfully!")
         name = form.name.data 
         form.name.data = ""
         form.email.data = ""  
+        form.badge.data = "" 
     
     our_users = Users.query.order_by(Users.date_added)
           
@@ -123,10 +150,11 @@ def update(id):
     if request.method == 'POST':
         name_to_update.name = request.form['name']
         name_to_update.email = request.form['email']
+        name_to_update.badge = request.form['badge']
 
         try:
             db.session.commit()
-            flash("User data updated successfully!", "info")
+            flash(f"{name_to_update.name}'s data updated successfully!", "info")
             return redirect('/user/add')
         except:
             flash("Something went wrong! Please try again!")

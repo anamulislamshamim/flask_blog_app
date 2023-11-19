@@ -3,6 +3,7 @@
 {% block title %}Add User{% endblock %}
 
 {% block content %}
+ 
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 {% for message in messages %}
@@ -17,7 +18,7 @@
                 {% endfor %}
             {% endif %}
         {% endwith%}
-        
+ 
         <h1 class="text-secondary mt-5">Add New User</h1><br/>
         <form method="POST" class="shadow-sm p-4 bg-light rounded">
             {{ form.hidden_tag() }}
@@ -27,6 +28,15 @@
 
             {{ form.email.label(class="form-label") }}<br/>
             {{ form.email(class='form-control', placeholder="email") }} </br>
+
+            {{ form.password_hash.label(class="form-label") }}<br/>
+            {{ form.password_hash(class='form-control', placeholder="password") }} </br>
+
+            {{ form.password_hash2.label(class="form-label") }}<br/>
+            {{ form.password_hash2(class='form-control', placeholder="confirm password") }} </br>
+
+            {{ form.badge.label(class="form-label") }}<br/>
+            {{ form.badge(class='form-control', placeholder="bagde: e.g. silver, golden...") }} </br>
             
             <br>
             {{ form.submit( class='btn btn-primary') }}
@@ -39,6 +49,8 @@
             <th scope="col">Id</th>
             <th scope="col">Name</th>
             <th scope="col">Email</th>
+            <th scope="col">Password</th>
+            <th scope="col">Badge</th>
             <th scope="col">Join Date</th>
             <th scope="col">Modify</th>
           </tr>
@@ -49,9 +61,11 @@
             {% else %}
                 {% for user in our_users %}
                     <tr>
-                        <th scope="row">{{ user._id }}</th>
+                        <td>{{ user._id }}</td>
                         <td>{{ user.name }}</td>
                         <td>{{ user.email }}</td>
+                        <td>{{ user.password_hash[0:25] }}...</td>
+                        <td>{{ user.badge }}</td>
                         <td>{{ user.date_added}}</td>
                         <td>
                             <a class="text-warning" href="{{ url_for('update', id= user._id )}}">Update</a>
