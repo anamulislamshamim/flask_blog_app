@@ -1,11 +1,12 @@
-from flask import Flask, render_template, flash, request, redirect
+from flask import Flask, render_template, flash, request, redirect, jsonify
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, validators, PasswordField, ValidationError
 from wtforms.validators import DataRequired, EqualTo
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, date
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
+
 
 
 # create database instance 
@@ -218,3 +219,34 @@ def delete(id):
         flash("User doesn't exist! Somethng went wrong! Please try again!")
         
     return redirect('/user/add')
+
+
+# JSON Thing
+@app.route('/date')
+def get_current_date():
+    swe_team_members = {
+        "Shamim": {
+            "designation": "Software Engineer",
+            "work_area": "Backend",
+            "technology": "Python, Flask, Django",
+            "location": "Remote"
+        },
+        
+        "Dr. Duy Trung": {
+            "designation": "Senior Software Engineer",
+            "work_area": "Backend",
+            "technology": "Python, Flask, Django",
+            "location": "Berlin"
+        },
+        
+        "Julian Karhof": {
+            "designation": "UI/UX Designer",
+            "work_area": "Frontend",
+            "technology": "Figma, XD, HTML, CSS, Photoshop",
+            "location": "Saarland"
+        },
+    }
+    return jsonify({
+        "Date": date.today(),
+        "team": swe_team_members,
+        })
