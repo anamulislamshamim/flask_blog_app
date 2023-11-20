@@ -63,6 +63,19 @@ class Users(db.Model):
         return "<Name %r>" % self.name 
 
 
+# namer form for /name route 
+class NamerForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    email = StringField("Email", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+
+# password form  
+class PasswordForm(FlaskForm):
+    email = StringField("Email", validators=[DataRequired()])
+    password = PasswordField("Password", validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
 # create a form class 
 class UserForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
@@ -105,7 +118,7 @@ def page_not_found(e):
 @app.route('/name', methods=['GET', 'POST'])
 def name():
     name = None 
-    form = UserForm()
+    form = NamerForm()
     if form.validate_on_submit():
         name = form.name.data 
         form.name.data = ''
@@ -113,6 +126,36 @@ def name():
         
     return render_template('name.html',
                            name=name,
+                           form=form)
+
+
+# create a name page 
+@app.route('/test_password', methods=['GET', 'POST'])
+def test_password():
+    email = None 
+    password = None
+    password_to_check = None 
+    passed = None 
+    
+    form =PasswordForm()
+    
+    if form.validate_on_submit():
+        email = form.email.data 
+        password = form.password.data 
+        form.email.data = ''
+        form.password.data = ''
+        flash(f"Email & Password submitted successfully!", "info")
+        # look up users by email
+        password_to_check = Users.query.filter_by(email=email).first()
+        
+        # check hashed password
+        passed = check_password_hash(password_to_check.password_hash, password)
+        
+    return render_template('test_password.html',
+                           email = email, 
+                           password = password,
+                           password_to_check=password_to_check,
+                           passed=passed,
                            form=form)
 
 
