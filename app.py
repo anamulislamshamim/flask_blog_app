@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
+from wtforms.widgets import TextArea
 
 
 
@@ -37,7 +38,7 @@ app = create_app()
 migrate = Migrate(app, db)
 
 
-# Create Database Model. Note: Model is actually nothing but database table.
+# Create Database Model for users. Note: Model is actually nothing but database table.
 class Users(db.Model):
     # here specify the fields 
     _id = db.Column("id", db.Integer, primary_key=True)
@@ -62,6 +63,25 @@ class Users(db.Model):
     
     def __repr__(self):
         return "<Name %r>" % self.name 
+
+
+# Blog Post model 
+class Posts(db.Model):
+    _id = db.Column("id", db.Integer, primary_key=True)
+    title = db.Column(db.String(255))
+    content = db.Column(db.Text)
+    author = db.Column(db.String(255))
+    date_posted = db.Column(db.DateTime, default=datetime.utcnow)
+    slug = db.Column(db.String(255))
+
+
+# post form
+class PostForm(FlaskForm):
+    title = StringField("Blog Title", validators=[DataRequired()])
+    content = StringField("Content", validators=[DataRequired()], widget=TextArea())
+    author = StringField("Author", validators=[DataRequired()])
+    slug = StringField("Slug", validators=[DataRequired()])
+    submit = SubmitField("Add Blog")
 
 
 # namer form for /name route 
@@ -250,3 +270,38 @@ def get_current_date():
         "Date": date.today(),
         "team": swe_team_members,
         })
+    
+
+# route for add blog post 
+@app.route('/add-post', methods=['GET', 'POST'])
+def add_post():
+    form = PostForm()
+    
+    if form.validate_on_submit():
+        post = Posts(title=form.title.data, content=form.content.data, author=form.author.data, slug=form.slug.data)
+        form.title.data = ""
+        form.author.data = "" 
+        form.slug.data = "" 
+        form.content.data = "" 
+        
+        # add the post to the Posts database 
+        db.session.add(post)
+        db.session.commit() 
+        
+        flash("Blog added successfully", "info")
+        
+    return render_template('add_post.html', form=form)
+
+
+@app.route('/posts')
+def posts():
+    posts = Posts.query.order_by(Posts.date_posted)
+    return render_template('posts.html', posts=posts)
+
+
+@app.route('/post/details/<int:id>')
+def details(id):
+    post = Posts.query.filter_by(_id=id).first()
+    
+    return render_template('details.html', post=post)
+        

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Blogs{% endblock %}
+
+{% block content %}
+    {% for post in posts %}
+        <a style="text-decoration: none;" href="{{ url_for("details", id=post._id) }}">
+            <div class="card mt-5 shadow">
+                <div class="card-header">
+                    <h5>{{ post.title }} {{ post._id }}</h5>
+                    <small>Author: {{ post.author }}</small>
+                </div>
+                <div class="card-body">
+                  <blockquote class="blockquote mb-0">
+                    <p style="font-size: 15px;">{{ post.content[0:100] }}...more</p>
+                    <small style="font-size:12px;">Published: {{ post.date_posted }}</small>
+                  </blockquote>
+                </div>
+            </div>
+        </a>
+    {% endfor %}
+{% endblock content %}
